@@ -1,0 +1,6 @@
+﻿l_simp_chinese:
+ NCI_integrate_category:0 "非核心整合"
+ NCI_integrate_category_desc:0 "把由本国完全控制、但尚未核心化的领土（已吞并的或战时占领的）整合为本国核心。"
+ NCI_integrate_state:0 "整合 §Y[FROM.GetName]§!"
+ NCI_integrate_state_desc:0 "启动对 §Y[FROM.GetName]§! 的整合进程。\n\n完成后该州获得我国的§G核心§!。注意本决议§Y不改变所有权§!——如果你还没拥有该州，这相当于取得一份永久法理宣称：日后和平会议把这块地划给你时，它立刻就是核心，不会再吃非核心惩罚。\n\n§Y前置条件：§!该州必须由我国完全控制，且尚未成为我国核心。"
+ NCI_integration_in_progress:0 "整合进行中"

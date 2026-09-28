@@ -1,0 +1,36 @@
+############################################################
+#  非核心整合  (Non-Core Integration) —— 决议分类定义
+#
+#  HOI4 的硬性规定：
+#    · 分类的「属性」（icon / priority / allowed / visible ...）
+#      只能写在 common/decisions/categories/ 下的文件里；
+#    · 决议本体写在 common/decisions/ 下的文件里，
+#      用【同名顶层键】把决议包起来。
+#    两边顶层键名字必须完全一致，否则报 Unknown category。
+############################################################
+
+NCI_integrate_category = {
+
+	# 分类图标：原版 interface/decisions.gfx 里已定义的全名。
+	icon = GFX_decision_category_generic_formable_nations
+
+	priority = 90
+
+	# 当前没有可整合的州时也保留这个分类标签，方便玩家找得到。
+	visible_when_empty = yes
+
+	allowed = {
+		# 【调参①】通用：所有国家都可以用这个决议。
+		# 只想给某一个国家用，就把下面这行删掉，换成例如：  original_tag = GER
+		always = yes
+	}
+
+	visible = {
+		# 只要「存在尚未核心化、且由我国完全控制的州」就显示这个分类。
+		# 用 any_controlled_state 而非 any_owned_state：
+		# 这样只占领、还没正式拥有的地也算，分类才会露出来。
+		any_controlled_state = {
+			NOT = { is_core_of = ROOT }
+		}
+	}
+}

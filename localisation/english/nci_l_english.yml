@@ -1,0 +1,6 @@
+﻿l_english:
+ NCI_integrate_category:0 "Non-Core Integration"
+ NCI_integrate_category_desc:0 "Turn fully controlled but non-core territory into national cores — annexed land and wartime occupied land alike."
+ NCI_integrate_state:0 "Integrate §Y[FROM.GetName]§!"
+ NCI_integrate_state_desc:0 "Begin integrating §Y[FROM.GetName]§!.\n\nOnce complete the state gains a §Gcore§! of our nation. Ownership does not change — if we do not own the state yet, this acts as a permanent legal claim: should a peace conference award it to us, it will already be a core.\n\n§YRequirements:§! the state must be fully controlled by us and must not already be our core."
+ NCI_integration_in_progress:0 "Integration in progress"

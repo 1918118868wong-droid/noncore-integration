@@ -1,0 +1,143 @@
+############################################################
+#  非核心整合  (Non-Core Integration) —— 决议本体
+#
+#  作用：把由本国「完全控制」、但尚未核心化的州，整合为本国核心。
+#        既包括已经吞并进来的自有领土，也包括战时占领的敌国土地。
+#
+#  重要：本 mod 只加「核心」，不转移所有权。
+#        如果该州你还没拥有，完成后你会在那里获得一个核心 ——
+#        效果等同于一份永久法理宣称：日后和平会议把这块地划给你时，
+#        它立刻就是核心，不会再吃非核心惩罚。
+#
+#  触发：逐州决议 —— 决议面板里会为每个符合条件的州各生成一条，
+#        也可以用地图选点模式点州。
+#        允许多个州【同时】整合，各自独立计时，互不影响。
+#
+#  结构：最外层 NCI_integrate_category 是「壳」，名字必须和
+#        common/decisions/categories/nci_categories.txt 里的分类
+#        完全一致。分类的属性写在那个文件里，这里只放决议。
+#
+#  兼容性：不修改地图 / 历史 / 国家 / 国策文件，不覆盖任何原版路径，
+#          可与其他 mod 共存。
+############################################################
+
+NCI_integrate_category = {
+
+	NCI_integrate_state = {
+
+		# 图标：决议图标用「GFX_decision_ 前缀」的全名。
+		icon = GFX_decision_generic_form_nation
+
+		allowed = {
+			always = yes
+		}
+
+		available = {
+			# 【调参②】并发开关。
+			# 现在这里【没有】任何并发限制 —— 可以同时整合任意多个州，
+			# 每个州各自走自己的 45 天进度条，互不阻塞。
+			# 花销由政治点自然限制（每州 50 点）。
+			#
+			# 想恢复成「一次只能整合一个州」，见文件末尾的说明。
+			FROM = {
+				is_fully_controlled_by = ROOT
+			}
+		}
+
+		visible = {
+			FROM = {
+				NOT = { is_core_of = ROOT }
+				is_fully_controlled_by = ROOT
+			}
+		}
+
+		# 目标池：扫描「由我国控制的州」。
+		#   any_owned_state      → 只算自己拥有的（已吞并的地）
+		#   any_controlled_state → 自己拥有的 + 战时占领的，都算  ← 现在用这个
+		# 键名用 state_target。原版文档里写的 state_trigger 在原版文件中
+		# 一次都没用过，实际生效的是 state_target（原版用了 290 次）。
+		state_target = any_controlled_state
+
+		target_trigger = {
+			FROM = {
+				# 条件一：还不是自己的核心
+				NOT = { is_core_of = ROOT }
+
+				# 条件二：必须完全控制在手
+				is_fully_controlled_by = ROOT
+
+				# 条件三（已按你的要求删掉）：
+				# 原本这里要求「原属国已灭亡」——即没有任何存活国家
+				# 对该州保有核心。现在放宽了：只要控制住就能整合，
+				# 战时可以直接对活着的敌国领土动手。
+				#
+				# 想改回严格模式，在下面补回这一段：
+				#   NOT = {
+				#       any_country_with_core = {
+				#           exists = yes
+				#       }
+				#   }
+			}
+		}
+
+		on_map_mode = map_and_decisions_view
+
+		cost = 50			# 【调参③】消耗政治点，每个州各扣一次
+		days_remove = 45	# 【调参④】整合耗时（天），各州独立计时
+
+		# 不做成一次性决议。已经点过、正在整合的州会进入「进行中」区，
+		# 走完进度条才结束，期间不会重复出现在可点列表里。
+		fire_only_once = no
+
+		# 该州一旦不再由我国完全控制（丢了、被围困、控制权转给盟友），
+		# 本次整合自动取消，政治点不退。
+		cancel_if_not_visible = yes
+
+		remove_effect = {
+			# 完成时：只加核心，不转移所有权。
+			FROM = {
+				add_core_of = ROOT
+			}
+		}
+
+		# 【调参⑤】AI 不使用本决议。想让 AI 也用，改成 factor = 1
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}
+
+############################################################
+#  附：想恢复「一次只能整合一个州」
+#
+#  并发是靠 available 里的一段检查 + 一个国家标记卡住的。恢复方法：
+#
+#  1) 在 available 块里加回这三行：
+#         NOT = {
+#             has_country_flag = NCI_integration_in_progress
+#         }
+#
+#  2) 在决议里补上打标记 / 清标记：
+#         complete_effect = {
+#             hidden_effect = {
+#                 set_country_flag = NCI_integration_in_progress
+#             }
+#         }
+#         remove_effect = {
+#             FROM = { add_core_of = ROOT }
+#             hidden_effect = {
+#                 clr_country_flag = NCI_integration_in_progress
+#             }
+#         }
+#         cancel_effect = {
+#             hidden_effect = {
+#                 clr_country_flag = NCI_integration_in_progress
+#             }
+#         }
+#
+#  注意 cancel_effect 必须一并补上：整合中途丢地时，
+#  靠它把标记清掉，否则那个国家会永久卡住、再也整合不了任何州。
+#
+#  只想「最多同时 N 个」的话，标记方案不适用，得改用计数器变量，
+#  需要的话可以再加。
+############################################################
